@@ -18,12 +18,12 @@ class CheckView : View {
 
     companion object {
         const val UNCHECKED = Integer.MIN_VALUE
-        private const val STROKE_WIDTH = 3.0f           // 圆环宽度
+        private const val STROKE_WIDTH = 1.0f           // 圆环宽度
         private const val SHADOW_WIDTH = 6.0f           // 阴影宽度
         private const val SIZE = 30
-        private const val STROKE_RADIUS = 11.5f
-        private const val BG_RADIUS = 11.0f
-        private const val CONTENT_SIZE = 16
+        private const val STROKE_RADIUS = 12f
+        private const val BG_RADIUS = 13f
+        private const val CONTENT_SIZE = 18
     }
 
     private var countable = false
@@ -114,26 +114,24 @@ class CheckView : View {
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-
-        // draw outer and inner shadow
-        initShadowPaint()
-        shadowPaint?.apply {
-            canvas?.drawCircle(
-                halfDensitySize, halfDensitySize,
-                kdensity.times(STROKE_RADIUS + STROKE_WIDTH / 2 + SHADOW_WIDTH), this
-            )
-        }
-
-        // draw white stroke
-        strokePaint?.apply {
-            canvas?.drawCircle(
-                halfDensitySize, halfDensitySize, kdensity.times(STROKE_RADIUS), this
-            )
-        }
-
+        canvas?.setDrawFilter(PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
+        val bitmapOn = BitmapFactory.decodeResource(resources,R.drawable.ic_preview_radio_on);
+        val bitmapOff = BitmapFactory.decodeResource(resources,R.drawable.ic_preview_radio_off);
+        // 指定图片在屏幕上显示的区域
+        val srcRect = Rect(0, 0, bitmapOff.width, bitmapOff.height)
+        // 指定图片在屏幕上显示的区域
+        val dstRect = Rect(0, 0, width, height)
         // draw content
+
         if (countable) {
             if (checkedNum != UNCHECKED) {
+//                setBackgroundResource(R.drawable.ic_preview_radio_on)
+
+
+
+                Paint().apply {
+                    canvas?.drawBitmap(bitmapOn, srcRect,dstRect,null)
+                }
                 initBackgroundPaint()
                 backgroundPaint?.apply {
                     canvas?.drawCircle(
@@ -147,21 +145,22 @@ class CheckView : View {
                     val baseY = (height - descent() - ascent()) / 2
                     canvas?.drawText(text, baseX, baseY, this)
                 }
+            }else{
+                Paint().apply {
+                    canvas?.drawBitmap(bitmapOff, srcRect,dstRect,this)
+                }
             }
         } else {
-            if (checked) {
-                initBackgroundPaint()
-                backgroundPaint?.apply {
-                    canvas?.drawCircle(
-                        halfDensitySize, halfDensitySize, BG_RADIUS * kdensity, this
-                    )
-                }
-                if (canvas != null) {
-                    checkDrawable?.bounds = getCheckRect()
-                    checkDrawable?.draw(canvas)
+            Paint().apply {
+                if (checked) {
+                    canvas?.drawBitmap(bitmapOn, srcRect,dstRect,this)
+                }else{
+                    canvas?.drawBitmap(bitmapOff, srcRect,dstRect,this)
                 }
             }
         }
+        bitmapOn.recycle()
+        bitmapOff.recycle()
         alpha = if (enable) 1.0f else 0.5f
     }
 
@@ -181,8 +180,8 @@ class CheckView : View {
             textPaint = TextPaint().run {
                 isAntiAlias = true
                 color = Color.WHITE
-                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                textSize = 12.0f * kdensity
+                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC)
+                textSize = 14.0f * kdensity
                 this
             }
         }
@@ -201,6 +200,8 @@ class CheckView : View {
             val color = ta.getColor(0, defaultColor)
             ta.recycle()
             backgroundPaint?.color = color
+
+
         }
     }
 
