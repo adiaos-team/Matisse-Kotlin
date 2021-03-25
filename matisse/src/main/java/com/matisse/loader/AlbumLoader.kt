@@ -14,6 +14,7 @@ import com.matisse.MimeTypeManager
 import com.matisse.entity.Album
 import com.matisse.internal.entity.SelectionSpec
 import com.matisse.utils.Platform.beforeAndroidTen
+import java.lang.Exception
 import java.util.*
 
 /**
@@ -30,13 +31,7 @@ class AlbumLoader(context: Context, selection: String, selectionArgs: Array<out 
         const val COLUMN_COUNT = "count"
         private val QUERY_URI = MediaStore.Files.getContentUri("external")
         const val BUCKET_ID = "bucket_id"
-        var BUCKET_DISPLAY_NAME = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
-        } else {
-//             ("VERSION.SDK_INT < Q")
-            MediaStore.MediaColumns.RELATIVE_PATH
-        };//"bucket_display_name"
-
+        const val BUCKET_DISPLAY_NAME = "bucket_display_name"
         private const val BUCKET_ORDER_BY = "datetaken DESC"
 
         const val COLUMN_URI = "uri"
@@ -169,24 +164,24 @@ class AlbumLoader(context: Context, selection: String, selectionArgs: Array<out 
                     val fileId = getLong(getColumnIndex(MediaStore.Files.FileColumns._ID))
                     var bucketDisplayName = getString(getColumnIndex(BUCKET_DISPLAY_NAME))
                     if (TextUtils.isEmpty(bucketDisplayName)){
-                        bucketDisplayName = getString(getColumnIndex("relative_path"))
-                        if (TextUtils.isEmpty(bucketDisplayName)){
-                            bucketDisplayName = "未知"
-                        }
+                        bucketDisplayName = "未知"
                     }
                     val mimeType = getString(getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
                     val uri = getUri(this)
                     val count = countMap[bucketId]
 
-                    otherAlbums.addRow(
-                        arrayOf<String>(
-                            fileId.toString(), bucketId.toString(), bucketDisplayName,
-                            mimeType, uri.toString(), count.toString()
+                    try {
+                        otherAlbums.addRow(
+                                arrayOf<String>(
+                                        fileId.toString(), bucketId.toString(), bucketDisplayName,
+                                        mimeType, uri.toString(), count.toString()
+                                )
                         )
-                    )
-                    done.add(bucketId)
-
-                    totalCount += count?.toInt() ?: 0
+                        done.add(bucketId)
+                        totalCount += count?.toInt() ?: 0
+                    }catch (e:Exception){
+                        continue
+                    }
                 } while (albums.moveToNext())
             }
         }
