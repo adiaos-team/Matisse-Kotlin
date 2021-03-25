@@ -189,7 +189,7 @@ class CheckView : View {
             textPaint = TextPaint().run {
                 isAntiAlias = true
                 color = Color.WHITE
-                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC)
+                typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
                 textSize = 14.0f * kdensity
                 this
             }
