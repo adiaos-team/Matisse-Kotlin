@@ -18,11 +18,11 @@ class CheckView : View {
 
     companion object {
         const val UNCHECKED = Integer.MIN_VALUE
-        private const val STROKE_WIDTH = 1.0f           // 圆环宽度
+        private const val STROKE_WIDTH = 1.5f           // 圆环宽度
         private const val SHADOW_WIDTH = 6.0f           // 阴影宽度
         private const val SIZE = 30
-        private const val STROKE_RADIUS = 12f
-        private const val BG_RADIUS = 13f
+        private const val STROKE_RADIUS = 12.5f
+        private const val BG_RADIUS = 13.5f
         private const val CONTENT_SIZE = 18
     }
 
@@ -66,7 +66,7 @@ class CheckView : View {
         )
         val color = ta.getColor(0, defaultColor)
         ta.recycle()
-        strokePaint?.color = color
+        strokePaint?.color = Color.WHITE//color
 
         checkDrawable = ResourcesCompat.getDrawable(
             context.resources, R.drawable.ic_check_white_18dp, context.theme
@@ -115,7 +115,7 @@ class CheckView : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         canvas?.setDrawFilter(PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
-        val bitmapOn = BitmapFactory.decodeResource(resources,R.drawable.ic_preview_radio_on);
+        val bitmapOn = BitmapFactory.decodeResource(resources,R.drawable.ic_preview_radio_on2);
         val bitmapOff = BitmapFactory.decodeResource(resources,R.drawable.ic_preview_radio_off);
         // 指定图片在屏幕上显示的区域
         val srcRect = Rect(0, 0, bitmapOff.width, bitmapOff.height)
@@ -161,6 +161,15 @@ class CheckView : View {
         }
         bitmapOn.recycle()
         bitmapOff.recycle()
+
+        // draw white stroke
+        strokePaint?.apply {
+            canvas?.drawCircle(
+                    halfDensitySize, halfDensitySize, kdensity.times(STROKE_RADIUS+STROKE_WIDTH), this
+            )
+        }
+
+
         alpha = if (enable) 1.0f else 0.5f
     }
 
@@ -193,9 +202,9 @@ class CheckView : View {
             backgroundPaint?.isAntiAlias = true
             backgroundPaint?.style = Paint.Style.FILL
             val ta: TypedArray =
-                context.theme.obtainStyledAttributes(intArrayOf(R.attr.Item_checkCircle_bgColor))
+                    context.theme.obtainStyledAttributes(intArrayOf(R.attr.Item_checkCircle_bgColor))
             val defaultColor = ResourcesCompat.getColor(
-                context.resources, R.color.selector_base_text, context.theme
+                    context.resources, R.color.selector_base_text, context.theme
             )
             val color = ta.getColor(0, defaultColor)
             ta.recycle()
